@@ -167,8 +167,8 @@ class Interfaz():
                             [p.marca + ": " + p.nombre, "Electronico", p.supermercado.nombre, str(p.cantidad),
                              str(int(p.cantidad) * int(p.precio)), ""])
                     elif isinstance(p, Ropa):
-                        productos.append([p.tallaRopa+ ": " + p.nombreRopa, "Ropa", p.supermercado.nombre, str(p.cantidadRopa),
-                             str (int(p.cantidadRopa) * int(p.precioRopa)), ""])
+                        productos.append([p.nombre +": "+ p.talla , "Ropa", p.supermercado.nombre, str(p.cantidad),
+                             str (int(p.cantidad) * int(p.precio)), ""])
 
                     total = total + (int(p.cantidad) * int(p.precio))
 
@@ -361,7 +361,7 @@ class Interfaz():
                             messagebox.showerror("Error", "Precio y cantidad deben ser valores numéricos.")
                             return
                         
-                        ropa = Ropa(talla, marca, color, nombre, precio, cantidad, self.mercado)
+                        ropa = Ropa(talla, color, precio, nombre, cantidad, self.mercado)
                         self.mercado.oferropa.append(ropa)
                         
                         messagebox.showinfo("Éxito", "Producto agregado con éxito.")
@@ -2184,38 +2184,68 @@ También, permite agregar un nuevo supermercado al listado"""
 
             #ComprarRopa-By Yiduar
             def comprarRopa():
-
-                if self.mercado.nombre == None:
+                if self.mercado.nombre is None:
                     raise comprarSinEligirSup(selectsuper)
-                if self.cliente.nombre == None:
+                elif self.cliente.nombre is None:
                     raise comprarSinUsuario(IdenUsuario)
                 limpia_frame()
-                tk.Label(frame_zona2, text=f"Comprar Ropa en {self.mercado.nombre}", borderwidth=2,
-             relief="solid", font="Times 13", bg="white").pack(pady=20)
-                tk.Label(frame_zona2, text="Aquí podrá comprar la ropa agregada al supermercado seleccionado",
-                         borderwidth=2, relief="solid", font="Times 13", bg="white").pack(pady=20)
                 
-                # Mostrar la lista de ropa agregada
-                listbox_ropa = tk.Listbox(frame_zona2, borderwidth=2, relief="solid", font="Times 13", bg="white")
-                for ropa in self.mercado.oferropa:
-                    listbox_ropa.insert(tk.END, ropa.nombre)
-                listbox_ropa.pack(pady=20)
+                def mostraroferropa(oferropa):
                 
-                # Función para seleccionar y comprar la rop
-                def comprarRop():
-                    index = int(listbox_ropa.curselection()[0])
-                    ropa_seleccionada = self.mercado.oferropa[index]
-        # Aquí puedes agregar el código para realizar la compra de la ropa seleccionada
-        # Puedes utilizar la instancia de la ropa seleccionada para acceder a sus atributos y realizar acciones
-                    messagebox.showinfo("Éxito", f"Ha comprado {ropa_seleccionada.nombre}.")
-                    otro = messagebox.askyesno("Comprar otra ropa", "¿Desea comprar otra prenda de ropa?")
-                    if otro:
-                        comprarRopa()
+                    limpia_frame()
+                    
+                    
+                    def selectropa(event):
+                        
+                        
+                        selected_item = oferropa[int(listbox_ropa.get(listbox_ropa.curselection())[0]) - 1]
+                        
+                        def agregarropaalcarro():
+                            limpia_frame()
+        
+                            print(selected_item.supermercado)
+                            añadirAlCarrito(selected_item, self.mercado.oferropa)
+                            otro = messagebox.askyesno(
+                                message="¡Ropa agregada con éxito!\n\n¿Desea finalizar su compra?", title="Ropa")
+                            
+                            if otro:
+                                finalizarCompra()
+                                pass
+                            else:
+                                comprarRopa()
+                                
+                        tk.Button(frame_zona2, text="Agregar al carrito", font="Times 13",
+                                  command=agregarropaalcarro).pack(pady=10)
+                        tk.Button(frame_zona2, text="Volver", font="Times 13", command=comprarRopa).pack()
+                        
+                    L_antesdelistbox = tk.Label(frame_zona2, text="Esta es la ropa que tenemos disponible", borderwidth=2,
+                                    relief="solid", font="Times 13", bg="white")
+                    L_antesdelistbox.pack(pady=20)
+                    
+                    
+                    listbox_ropa = tk.Listbox(frame_zona2, borderwidth=2, relief="solid", font="Times 13", bg="white")
+                    
+                    for l in range(len(oferropa)):
+                        listbox_ropa.insert(tk.END, str(l + 1) + ". " + str(oferropa[l].nombre) + ". " )
+                        listbox_ropa.pack()
+                        listbox_ropa.bind('<<ListboxSelect>>', selectropa)
+                        
+                tk.Label(frame_zona2, text=f"Comprar Ropa en {self.mercado.nombre}", borderwidth=2, relief="solid",font="Times 13", bg="white").pack(pady=20)
+                descrip_comprarRopa = """Esta es la funcionalidad que permite a los clientes comprar ropa en el supermercado seleccionado anteriormente"""
+                tk.Label(frame_zona2, text=descrip_comprarRopa, borderwidth=2, relief="solid", font="Times 13",bg="white").pack(pady=20)
+                
+                
+                tk.Label(frame_zona2, text="Ropa agregada:", borderwidth=2, relief="solid", font="Times 13",bg="white").pack(pady=20)
+                mostraroferropa(self.mercado.oferropa)
+                for ropa in self.cliente.carrito:
+                    tk.Label(frame_zona2, text=ropa.nombre, borderwidth=2, relief="solid", font="Times 13", bg="white").pack(pady=10)
 
-    # Botón para comprar la ropa seleccionada
-                comprar_button = tk.Button(frame_zona2, text="Comprar", font="Times 13", command=comprarRop)
-                comprar_button.pack(pady=10)
- 
+                    
+                   
+                    
+
+                    
+               
 
                         
                     
